@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sipalki Kwan Do Musul</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    html, body { height: 100%; margin: 0; }
+    .app-wrapper { height: 100%; overflow-y: auto; overflow-x: hidden; }
+    
+    .hero-pattern {
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(200,50,50,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(200,170,80,0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(200,50,50,0.08) 0%, transparent 50%);
+    }
+
+    .brush-stroke {
+      position: relative;
+    }
+    .brush-stroke::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #c83232, transparent);
+      border-radius: 2px;
+    }
+
+    .card-hover {
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.8s ease forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+
+    .yin-yang {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(to right, #1a1a2e 50%, #f5f0e8 50%);
+      position: relative;
+      animation: slowSpin 20s linear infinite;
+    }
+    .yin-yang::before, .yin-yang::after {
+      content: '';
+      position: absolute;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+    }
+    .yin-yang::before {
+      background: #f5f0e8;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      box-shadow: inset 0 0 0 5px #f5f0e8;
+    }
+    .yin-yang::after {
+      background: #1a1a2e;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+    }
+    @keyframes slowSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .belt-bar {
+      height: 8px;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #c83232;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .korean-border {
+      border: 2px solid rgba(200,50,50,0.2);
+      position: relative;
+    }
+    .korean-border::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: 20px;
+      width: 40px; height: 4px;
+      background: #c83232;
+    }
+
+    .section-divider {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, #c83232, #c8a850);
+      margin: 0 auto;
+      border-radius: 2px;
+    }
+
+    /* Scrollbar styling */
+    .app-wrapper::-webkit-scrollbar { width: 8px; }
+    .app-wrapper::-webkit-scrollbar-track { background: #1a1a2e; }
+    .app-wrapper::-webkit-scrollbar-thumb { background: #c83232; border-radius: 4px; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div class="app-wrapper" id="appWrapper" style="background-color: #0f0f1e; color: #f5f0e8; font-family: 'DM Sans', sans-serif;"><!-- Navigation -->
+   <nav id="mainNav" class="fixed top-0 left-0 w-full z-50 transition-all duration-300" style="background: rgba(15,15,30,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(200,50,50,0.15);">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+     <div class="flex items-center gap-3">
+      <div class="yin-yang" style="width:36px; height:36px;"></div><span id="navTitle" class="text-lg font-bold" style="font-family: 'Noto Serif KR', serif; color: #c83232;">Sipalki</span>
+     </div>
+     <div class="hidden md:flex items-center gap-6 text-sm"><a href="#historia" class="nav-link" style="color: #f5f0e8;">Historia</a> <a href="#filosofia" class="nav-link" style="color: #f5f0e8;">Filosofía</a> <a href="#tecnicas" class="nav-link" style="color: #f5f0e8;">Técnicas</a> <a href="#rangos" class="nav-link" style="color: #f5f0e8;">Rangos</a> <a href="#contacto" class="nav-link" style="color: #f5f0e8;">Contacto</a>
+     </div><button id="mobileMenuBtn" class="md:hidden p-2" style="color: #f5f0e8;"> <i data-lucide="menu" style="width:24px; height:24px;"></i> </button>
+    </div><!-- Mobile menu -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pb-4">
+     <div class="flex flex-col gap-3 text-sm"><a href="#historia" class="nav-link py-1" style="color: #f5f0e8;">Historia</a> <a href="#filosofia" class="nav-link py-1" style="color: #f5f0e8;">Filosofía</a> <a href="#tecnicas" class="nav-link py-1" style="color: #f5f0e8;">Técnicas</a> <a href="#rangos" class="nav-link py-1" style="color: #f5f0e8;">Rangos</a> <a href="#contacto" class="nav-link py-1" style="color: #f5f0e8;">Contacto</a>
+     </div>
+    </div>
+   </nav><!-- Hero Section -->
+   <header class="hero-pattern relative min-h-[600px] flex items-center justify-center text-center px-4 pt-20">
+    <div class="absolute inset-0 opacity-5" style="background-image: repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(200,50,50,0.3) 50px, rgba(200,50,50,0.3) 51px), repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(200,50,50,0.3) 50px, rgba(200,50,50,0.3) 51px);"></div>
+    <div class="relative z-10 max-w-3xl mx-auto">
+     <div class="flex justify-center mb-8 fade-in">
+      <div class="yin-yang"></div>
+     </div><!-- Korean characters decoration -->
+     <p class="text-sm tracking-[0.5em] mb-4 fade-in delay-1" style="color: #c8a850; font-family: 'Noto Serif KR', serif;">十八技 拳道 武術</p>
+     <h1 id="heroTitle" class="text-5xl md:text-7xl font-black mb-6 fade-in delay-2" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8; line-height: 1.1;">Sipalki <span style="color: #c83232;">Kwan Do</span> Musul</h1>
+     <p id="heroSubtitle" class="text-lg md:text-xl leading-relaxed mb-10 fade-in delay-3" style="color: rgba(245,240,232,0.7);">Arte marcial coreano milenario que integra 18 disciplinas de combate, forjando cuerpo, mente y espíritu en una tradición guerrera ancestral.</p>
+     <div class="flex flex-wrap justify-center gap-4 fade-in delay-4"><a href="#historia" class="px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105" style="background: #c83232; color: #f5f0e8;"> Descubrir Más </a> <a href="#contacto" class="px-8 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105" style="border: 2px solid #c8a850; color: #c8a850;"> Entrenar con Nosotros </a>
+     </div>
+    </div><!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 fade-in delay-6">
+     <div class="w-6 h-10 rounded-full border-2 flex justify-center pt-2" style="border-color: rgba(245,240,232,0.3);">
+      <div class="w-1.5 h-3 rounded-full animate-bounce" style="background: #c83232;"></div>
+     </div>
+    </div>
+   </header><!-- Quick Stats -->
+   <section class="py-12 px-4" style="background: rgba(200,50,50,0.05); border-top: 1px solid rgba(200,50,50,0.1); border-bottom: 1px solid rgba(200,50,50,0.1);">
+    <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+     <div class="fade-in delay-1">
+      <p class="text-3xl md:text-4xl font-black" style="color: #c83232; font-family: 'Noto Serif KR', serif;">18</p>
+      <p class="text-sm mt-1" style="color: rgba(245,240,232,0.6);">Disciplinas de Combate</p>
+     </div>
+     <div class="fade-in delay-2">
+      <p class="text-3xl md:text-4xl font-black" style="color: #c83232; font-family: 'Noto Serif KR', serif;">2000+</p>
+      <p class="text-sm mt-1" style="color: rgba(245,240,232,0.6);">Años de Tradición</p>
+     </div>
+     <div class="fade-in delay-3">
+      <p class="text-3xl md:text-4xl font-black" style="color: #c83232; font-family: 'Noto Serif KR', serif;">10</p>
+      <p class="text-sm mt-1" style="color: rgba(245,240,232,0.6);">Niveles de Cinturón</p>
+     </div>
+     <div class="fade-in delay-4">
+      <p class="text-3xl md:text-4xl font-black" style="color: #c83232; font-family: 'Noto Serif KR', serif;">∞</p>
+      <p class="text-sm mt-1" style="color: rgba(245,240,232,0.6);">Camino de Perfección</p>
+     </div>
+    </div>
+   </section><!-- Historia Section -->
+   <section id="historia" class="py-20 px-4">
+    <div class="max-w-5xl mx-auto">
+     <div class="text-center mb-14">
+      <p class="text-sm tracking-[0.3em] mb-3" style="color: #c8a850;">역사</p>
+      <h2 id="historyTitle" class="text-3xl md:text-4xl font-bold mb-4 brush-stroke inline-block" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8;">Historia y Origen</h2>
+      <div class="section-divider mt-6"></div>
+     </div>
+     <div class="grid md:grid-cols-2 gap-10 items-start">
+      <div class="space-y-6">
+       <div class="korean-border rounded-lg p-6 card-hover" style="background: rgba(245,240,232,0.03);">
+        <div class="flex items-start gap-4">
+         <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="scroll-text" style="width:20px; height:20px; color: #c83232;"></i>
+         </div>
+         <div>
+          <h3 class="font-bold text-lg mb-2" style="color: #f5f0e8;">Raíces Ancestrales</h3>
+          <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.65);">El Sipalki (십팔기) significa literalmente "18 habilidades" o "18 técnicas". Sus raíces se remontan a las artes marciales tradicionales coreanas desarrolladas durante las dinastías Joseon y Goryeo, recopiladas en antiguos tratados militares.</p>
+         </div>
+        </div>
+       </div>
+       <div class="korean-border rounded-lg p-6 card-hover" style="background: rgba(245,240,232,0.03);">
+        <div class="flex items-start gap-4">
+         <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="book-open" style="width:20px; height:20px; color: #c83232;"></i>
+         </div>
+         <div>
+          <h3 class="font-bold text-lg mb-2" style="color: #f5f0e8;">Muyedobotongji</h3>
+          <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.65);">El tratado militar ilustrado "Muyedobotongji" (무예도보통지, 1790) es la referencia fundamental del Sipalki. Compilado por orden del Rey Jeongjo, documenta las 18 artes marciales esenciales del ejército coreano.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="space-y-6">
+       <div class="korean-border rounded-lg p-6 card-hover" style="background: rgba(245,240,232,0.03);">
+        <div class="flex items-start gap-4">
+         <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="swords" style="width:20px; height:20px; color: #c83232;"></i>
+         </div>
+         <div>
+          <h3 class="font-bold text-lg mb-2" style="color: #f5f0e8;">Kwan Do Musul</h3>
+          <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.65);">"Kwan Do" hace referencia a la vía del arte marcial, mientras que "Musul" (무술) significa arte marcial o técnica guerrera. Juntos representan el camino completo del guerrero coreano que domina las 18 artes.</p>
+         </div>
+        </div>
+       </div>
+       <div class="korean-border rounded-lg p-6 card-hover" style="background: rgba(245,240,232,0.03);">
+        <div class="flex items-start gap-4">
+         <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="globe-2" style="width:20px; height:20px; color: #c83232;"></i>
+         </div>
+         <div>
+          <h3 class="font-bold text-lg mb-2" style="color: #f5f0e8;">Expansión Global</h3>
+          <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.65);">A lo largo del siglo XX, maestros coreanos llevaron el Sipalki a Latinoamérica y otras regiones del mundo, donde ha florecido con especial fuerza en Argentina, manteniendo la esencia y tradiciones originales.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Filosofía Section -->
+   <section id="filosofia" class="py-20 px-4" style="background: linear-gradient(180deg, rgba(200,50,50,0.04) 0%, transparent 100%);">
+    <div class="max-w-5xl mx-auto">
+     <div class="text-center mb-14">
+      <p class="text-sm tracking-[0.3em] mb-3" style="color: #c8a850;">철학</p>
+      <h2 id="philosophyTitle" class="text-3xl md:text-4xl font-bold mb-4 brush-stroke inline-block" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8;">Filosofía y Principios</h2>
+      <div class="section-divider mt-6"></div>
+     </div>
+     <div class="grid md:grid-cols-3 gap-6">
+      <div class="text-center p-8 rounded-xl card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);">
+       <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #c83232, #8b1a1a);"><i data-lucide="flame" style="width:28px; height:28px; color: #f5f0e8;"></i>
+       </div>
+       <h3 class="font-bold text-xl mb-3" style="color: #f5f0e8; font-family: 'Noto Serif KR', serif;">Cuerpo</h3>
+       <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.6);">Fortaleza física a través de la práctica constante. El cuerpo se templa como el acero, desarrollando resistencia, flexibilidad y potencia en cada movimiento.</p>
+      </div>
+      <div class="text-center p-8 rounded-xl card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);">
+       <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #c8a850, #8b7530);"><i data-lucide="brain" style="width:28px; height:28px; color: #f5f0e8;"></i>
+       </div>
+       <h3 class="font-bold text-xl mb-3" style="color: #f5f0e8; font-family: 'Noto Serif KR', serif;">Mente</h3>
+       <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.6);">Disciplina mental y concentración absoluta. La mente guía al cuerpo, desarrollando estrategia, calma interior y capacidad de decisión en cada situación.</p>
+      </div>
+      <div class="text-center p-8 rounded-xl card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);">
+       <div class="w-16 h-16 mx-auto mb-5 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #4a6fa5, #2d4a7a);"><i data-lucide="heart" style="width:28px; height:28px; color: #f5f0e8;"></i>
+       </div>
+       <h3 class="font-bold text-xl mb-3" style="color: #f5f0e8; font-family: 'Noto Serif KR', serif;">Espíritu</h3>
+       <p class="text-sm leading-relaxed" style="color: rgba(245,240,232,0.6);">Cultivo del espíritu guerrero con honor y respeto. El Do (camino) exige humildad, lealtad y la búsqueda constante de la superación personal.</p>
+      </div>
+     </div><!-- Five Principles -->
+     <div class="mt-14 p-8 rounded-xl" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,170,80,0.15);">
+      <h3 class="text-xl font-bold text-center mb-8" style="color: #c8a850; font-family: 'Noto Serif KR', serif;">Los Cinco Principios del Guerrero</h3>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+       <div class="text-center p-3">
+        <p class="text-2xl mb-2">🏔️</p>
+        <p class="font-bold text-sm" style="color: #f5f0e8;">Ye (禮)</p>
+        <p class="text-xs mt-1" style="color: rgba(245,240,232,0.5);">Cortesía</p>
+       </div>
+       <div class="text-center p-3">
+        <p class="text-2xl mb-2">⚔️</p>
+        <p class="font-bold text-sm" style="color: #f5f0e8;">Yom Chi (廉恥)</p>
+        <p class="text-xs mt-1" style="color: rgba(245,240,232,0.5);">Integridad</p>
+       </div>
+       <div class="text-center p-3">
+        <p class="text-2xl mb-2">🔥</p>
+        <p class="font-bold text-sm" style="color: #f5f0e8;">In Nae (忍耐)</p>
+        <p class="text-xs mt-1" style="color: rgba(245,240,232,0.5);">Perseverancia</p>
+       </div>
+       <div class="text-center p-3">
+        <p class="text-2xl mb-2">🎯</p>
+        <p class="font-bold text-sm" style="color: #f5f0e8;">Guk Gi (克己)</p>
+        <p class="text-xs mt-1" style="color: rgba(245,240,232,0.5);">Autocontrol</p>
+       </div>
+       <div class="text-center p-3 col-span-2 md:col-span-1">
+        <p class="text-2xl mb-2">🦅</p>
+        <p class="font-bold text-sm" style="color: #f5f0e8;">Baekjul Boolgool (百折不屈)</p>
+        <p class="text-xs mt-1" style="color: rgba(245,240,232,0.5);">Espíritu Indomable</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Técnicas Section -->
+   <section id="tecnicas" class="py-20 px-4">
+    <div class="max-w-5xl mx-auto">
+     <div class="text-center mb-14">
+      <p class="text-sm tracking-[0.3em] mb-3" style="color: #c8a850;">기술</p>
+      <h2 id="techniquesTitle" class="text-3xl md:text-4xl font-bold mb-4 brush-stroke inline-block" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8;">Técnicas y Disciplinas</h2>
+      <div class="section-divider mt-6"></div>
+     </div>
+     <p class="text-center max-w-2xl mx-auto mb-12 text-sm" style="color: rgba(245,240,232,0.6);">Las 18 artes del Sipalki abarcan técnicas con armas y mano vacía, creando un sistema marcial completo y equilibrado.</p><!-- Techniques Tabs -->
+     <div class="flex flex-wrap justify-center gap-2 mb-10"><button onclick="showTechTab('armas')" id="tab-armas" class="tech-tab px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300" style="background: #c83232; color: #f5f0e8;">Armas Tradicionales</button> <button onclick="showTechTab('mano')" id="tab-mano" class="tech-tab px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300" style="background: rgba(245,240,232,0.1); color: rgba(245,240,232,0.6);">Mano Vacía</button> <button onclick="showTechTab('especial')" id="tab-especial" class="tech-tab px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300" style="background: rgba(245,240,232,0.1); color: rgba(245,240,232,0.6);">Técnicas Especiales</button>
+     </div><!-- Armas Content -->
+     <div id="content-armas" class="tech-content grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🗡️</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Gum (劍)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Esgrima con espada. Técnicas de corte, estocada y defensa con la espada recta coreana.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🏹</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Gung (弓)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Tiro con arco tradicional coreano. Precisión, respiración y concentración absoluta.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🔱</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Chang (槍)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Arte de la lanza. Control de distancia y movimientos fluidos con el arma de largo alcance.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🪓</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Do (刀)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Técnicas con sable curvo. Cortes poderosos y movimientos circulares característicos.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🏏</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Bong (棒)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Manejo del bastón largo. Golpes, bloqueos y barridos con el arma más versátil.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🛡️</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Dang Pa (钂鈀)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Tridente coreano. Técnicas de atrape, desvío y control del oponente armado.</p>
+      </div>
+     </div><!-- Mano Vacía Content -->
+     <div id="content-mano" class="tech-content hidden grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">👊</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Kwon Bup (拳法)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Técnicas de puño y golpes de mano. Incluye golpes directos, circulares y ascendentes.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🦶</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Jok Sul (足術)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Arte de las patadas coreanas. Patadas altas, bajas, giratorias y en salto.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🤼</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Yusul (柔術)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Técnicas de proyección, luxación y control del oponente en combate cercano.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🧘</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Ho Shin Sul (護身術)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Defensa personal. Técnicas prácticas contra agarres, ataques y situaciones reales.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">💪</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Kyok Pa (擊破)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Rompimientos. Demostración de potencia y concentración de energía en un punto.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🌊</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Ki Gong (氣功)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Control de la energía interna. Respiración, meditación y canalización del Ki.</p>
+      </div>
+     </div><!-- Técnicas Especiales Content -->
+     <div id="content-especial" class="tech-content hidden grid sm:grid-cols-2 gap-4">
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">📜</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Hyung (型)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Formas o katas tradicionales. Secuencias de movimientos que encierran la esencia de cada técnica y transmiten el conocimiento ancestral.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">⚡</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Dae Ryun (對鍊)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Combate. Prácticas de enfrentamiento que van desde ejercicios acordados hasta combate libre controlado.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🎋</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Nak Bup (落法)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Técnicas de caída. Aprender a caer correctamente es fundamental para la seguridad y el dominio del combate cuerpo a cuerpo.</p>
+      </div>
+      <div class="p-5 rounded-lg card-hover" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.1);"><span class="text-2xl">🌀</span>
+       <h4 class="font-bold mt-3 mb-1" style="color: #f5f0e8;">Ssang Gum (雙劍)</h4>
+       <p class="text-xs" style="color: rgba(245,240,232,0.5);">Doble espada. Técnica avanzada que requiere coordinación excepcional manejando dos armas simultáneamente.</p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Rangos Section -->
+   <section id="rangos" class="py-20 px-4" style="background: linear-gradient(180deg, rgba(200,170,80,0.04) 0%, transparent 100%);">
+    <div class="max-w-4xl mx-auto">
+     <div class="text-center mb-14">
+      <p class="text-sm tracking-[0.3em] mb-3" style="color: #c8a850;">등급</p>
+      <h2 id="ranksTitle" class="text-3xl md:text-4xl font-bold mb-4 brush-stroke inline-block" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8;">Sistema de Rangos</h2>
+      <div class="section-divider mt-6"></div>
+     </div>
+     <p class="text-center max-w-xl mx-auto mb-12 text-sm" style="color: rgba(245,240,232,0.6);">El camino del practicante se refleja en el color de su cinturón, cada uno representando una etapa de crecimiento y conocimiento.</p>
+     <div class="space-y-3" id="beltList"><!-- Belts rendered by JS -->
+     </div>
+    </div>
+   </section><!-- Contacto Section -->
+   <section id="contacto" class="py-20 px-4" style="background: rgba(200,50,50,0.04);">
+    <div class="max-w-4xl mx-auto">
+     <div class="text-center mb-14">
+      <p class="text-sm tracking-[0.3em] mb-3" style="color: #c8a850;">연락처</p>
+      <h2 id="contactTitle" class="text-3xl md:text-4xl font-bold mb-4 brush-stroke inline-block" style="font-family: 'Noto Serif KR', serif; color: #f5f0e8;">Únete a Nosotros</h2>
+      <div class="section-divider mt-6"></div>
+     </div>
+     <div class="grid md:grid-cols-2 gap-8">
+      <div class="space-y-6">
+       <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="map-pin" style="width:18px; height:18px; color: #c83232;"></i>
+        </div>
+        <div>
+         <h4 class="font-bold text-sm" style="color: #f5f0e8;">Ubicación</h4>
+         <p class="text-sm" style="color: rgba(245,240,232,0.6);">Consulta nuestras sedes disponibles</p>
+        </div>
+       </div>
+       <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="clock" style="width:18px; height:18px; color: #c83232;"></i>
+        </div>
+        <div>
+         <h4 class="font-bold text-sm" style="color: #f5f0e8;">Horarios de Práctica</h4>
+         <p class="text-sm" style="color: rgba(245,240,232,0.6);">Lunes a Viernes: 18:00 - 21:00</p>
+         <p class="text-sm" style="color: rgba(245,240,232,0.6);">Sábados: 10:00 - 13:00</p>
+        </div>
+       </div>
+       <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: rgba(200,50,50,0.15);"><i data-lucide="users" style="width:18px; height:18px; color: #c83232;"></i>
+        </div>
+        <div>
+         <h4 class="font-bold text-sm" style="color: #f5f0e8;">Clases para Todos</h4>
+         <p class="text-sm" style="color: rgba(245,240,232,0.6);">Niños (6+), Jóvenes, Adultos</p>
+         <p class="text-sm" style="color: rgba(245,240,232,0.6);">No se requiere experiencia previa</p>
+        </div>
+       </div>
+      </div>
+      <div class="rounded-xl p-6" style="background: rgba(245,240,232,0.03); border: 1px solid rgba(200,50,50,0.15);">
+       <h3 class="font-bold text-lg mb-4" style="color: #f5f0e8;">Solicita Información</h3>
+       <form id="contactForm" class="space-y-4">
+        <div><label for="nameInput" class="block text-xs mb-1 font-semibold" style="color: rgba(245,240,232,0.5);">Nombre Completo</label> <input type="text" id="nameInput" placeholder="Tu nombre" class="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 transition-all" style="background: rgba(245,240,232,0.06); border: 1px solid rgba(200,50,50,0.15); color: #f5f0e8; --tw-ring-color: #c83232;" required>
+        </div>
+        <div><label for="emailInput" class="block text-xs mb-1 font-semibold" style="color: rgba(245,240,232,0.5);">Correo Electrónico</label> <input type="email" id="emailInput" placeholder="tu@email.com" class="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 transition-all" style="background: rgba(245,240,232,0.06); border: 1px solid rgba(200,50,50,0.15); color: #f5f0e8; --tw-ring-color: #c83232;" required>
+        </div>
+        <div><label for="messageInput" class="block text-xs mb-1 font-semibold" style="color: rgba(245,240,232,0.5);">Mensaje</label> <textarea id="messageInput" rows="3" placeholder="¿En qué estás interesado?" class="w-full px-4 py-2.5 rounded-lg text-sm outline-none focus:ring-2 transition-all resize-none" style="background: rgba(245,240,232,0.06); border: 1px solid rgba(200,50,50,0.15); color: #f5f0e8; --tw-ring-color: #c83232;"></textarea>
+        </div><button type="submit" class="w-full py-3 rounded-lg font-bold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-95" style="background: #c83232; color: #f5f0e8;"> Enviar Solicitud </button>
+        <div id="formMessage" class="hidden text-center text-sm py-2 rounded-lg"></div>
+       </form>
+      </div>
+     </div>
+    </div>
+   </section><!-- Footer -->
+   <footer class="py-8 px-4 text-center" style="border-top: 1px solid rgba(200,50,50,0.1);">
+    <div class="flex justify-center mb-4">
+     <div class="yin-yang" style="width:30px; height:30px;"></div>
+    </div>
+    <p id="footerText" class="text-sm" style="color: rgba(245,240,232,0.4);">© 2024 Sipalki Kwan Do Musul — El Camino de las 18 Artes</p>
+    <p class="text-xs mt-2" style="color: rgba(245,240,232,0.2);">십팔기 권도 무술</p>
+   </footer>
+  </div>
+  <script>
+    // Belt data
+    const belts = [
+      { name: 'Blanco', korean: '흰띠', color: '#f5f5f5', textColor: '#1a1a2e', desc: 'Pureza e inocencia. El comienzo del camino marcial.', level: '10° Gup' },
+      { name: 'Amarillo', korean: '노란띠', color: '#e6c84b', textColor: '#1a1a2e', desc: 'La tierra donde germina la semilla del conocimiento.', level: '8° Gup' },
+      { name: 'Naranja', korean: '주황띠', color: '#e6883b', textColor: '#1a1a2e', desc: 'El sol naciente. Primeros frutos del entrenamiento.', level: '7° Gup' },
+      { name: 'Verde', korean: '녹색띠', color: '#3da34d', textColor: '#f5f0e8', desc: 'Crecimiento. La planta crece fuerte con raíces firmes.', level: '6° Gup' },
+      { name: 'Azul', korean: '파란띠', color: '#2d6abf', textColor: '#f5f0e8', desc: 'El cielo. El practicante aspira a nuevas alturas.', level: '4° Gup' },
+      { name: 'Marrón', korean: '갈색띠', color: '#7a4a2a', textColor: '#f5f0e8', desc: 'Madurez. El árbol muestra su fortaleza.', level: '2° Gup' },
+      { name: 'Rojo', korean: '빨간띠', color: '#c83232', textColor: '#f5f0e8', desc: 'Peligro y pasión. Poder que exige responsabilidad.', level: '1° Gup' },
+      { name: 'Negro', korean: '검은띠', color: '#1a1a2e', textColor: '#f5f0e8', desc: 'Maestría y humildad. El verdadero camino apenas comienza.', level: '1° Dan+', border: true },
+    ];
+
+    function renderBelts() {
+      const list = document.getElementById('beltList');
+      list.innerHTML = '';
+      belts.forEach((belt, i) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-4 p-4 rounded-lg transition-all duration-300 hover:scale-[1.01]';
+        div.style.cssText = `background: rgba(245,240,232,0.03); border: 1px solid ${belt.border ? 'rgba(200,170,80,0.3)' : 'rgba(200,50,50,0.08)'}; animation: fadeUp 0.5s ease forwards; animation-delay: ${i * 0.06}s; opacity: 0;`;
+        div.innerHTML = `
+          <div class="flex-shrink-0 w-14 h-8 rounded" style="background: ${belt.color}; ${belt.border ? 'border: 1px solid rgba(200,170,80,0.5);' : ''}"></div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 flex-wrap">
+              <span class="font-bold text-sm" style="color: #f5f0e8;">${belt.name}</span>
+              <span class="text-xs" style="color: #c8a850;">${belt.korean}</span>
+              <span class="text-xs px-2 py-0.5 rounded-full" style="background: rgba(245,240,232,0.06); color: rgba(245,240,232,0.5);">${belt.level}</span>
+            </div>
+            <p class="text-xs mt-1 truncate" style="color: rgba(245,240,232,0.5);">${belt.desc}</p>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // Technique tabs
+    function showTechTab(tab) {
+      document.querySelectorAll('.tech-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tech-tab').forEach(el => {
+        el.style.background = 'rgba(245,240,232,0.1)';
+        el.style.color = 'rgba(245,240,232,0.6)';
+      });
+      document.getElementById('content-' + tab).classList.remove('hidden');
+      const activeTab = document.getElementById('tab-' + tab);
+      activeTab.style.background = '#c83232';
+      activeTab.style.color = '#f5f0e8';
+    }
+
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    });
+
+    // Close mobile menu on link click
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.add('hidden');
+      });
+    });
+
+    // Form handling
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const msg = document.getElementById('formMessage');
+      msg.classList.remove('hidden');
+      msg.style.background = 'rgba(200,50,50,0.15)';
+      msg.style.color = '#c8a850';
+      msg.textContent = '¡Gracias por tu interés! Este es un formulario de demostración.';
+      this.reset();
+      setTimeout(() => msg.classList.add('hidden'), 4000);
+    });
+
+    // Default config
+    const defaultConfig = {
+      school_name: 'Sipalki Kwan Do Musul',
+      hero_subtitle: 'Arte marcial coreano milenario que integra 18 disciplinas de combate, forjando cuerpo, mente y espíritu en una tradición guerrera ancestral.',
+      history_title: 'Historia y Origen',
+      philosophy_title: 'Filosofía y Principios',
+      techniques_title: 'Técnicas y Disciplinas',
+      ranks_title: 'Sistema de Rangos',
+      contact_title: 'Únete a Nosotros',
+      footer_text: '© 2024 Sipalki Kwan Do Musul — El Camino de las 18 Artes',
+      background_color: '#0f0f1e',
+      surface_color: '#1a1a2e',
+      text_color: '#f5f0e8',
+      primary_action_color: '#c83232',
+      secondary_action_color: '#c8a850',
+      font_family: 'DM Sans',
+      font_size: 16
+    };
+
+    // Element SDK initialization
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        const c = { ...defaultConfig, ...config };
+        
+        // Apply text
+        document.getElementById('heroTitle').innerHTML = `${c.school_name.replace('Kwan Do', '<span style="color:' + c.primary_action_color + '">Kwan Do</span>')}`;
+        document.getElementById('heroSubtitle').textContent = c.hero_subtitle;
+        document.getElementById('historyTitle').textContent = c.history_title;
+        document.getElementById('philosophyTitle').textContent = c.philosophy_title;
+        document.getElementById('techniquesTitle').textContent = c.techniques_title;
+        document.getElementById('ranksTitle').textContent = c.ranks_title;
+        document.getElementById('contactTitle').textContent = c.contact_title;
+        document.getElementById('footerText').textContent = c.footer_text;
+        document.getElementById('navTitle').textContent = c.school_name.split(' ')[0] || 'Sipalki';
+
+        // Apply colors
+        document.getElementById('appWrapper').style.backgroundColor = c.background_color;
+        document.getElementById('appWrapper').style.color = c.text_color;
+
+        // Primary action color on buttons and accents
+        document.querySelectorAll('[style*="background: #c83232"], [style*="background:#c83232"]').forEach(el => {
+          el.style.background = c.primary_action_color;
+        });
+
+        // Secondary action / accent color
+        document.querySelectorAll('[style*="color: #c8a850"]').forEach(el => {
+          el.style.color = c.secondary_action_color;
+        });
+
+        // Nav title color
+        document.getElementById('navTitle').style.color = c.primary_action_color;
+
+        // Font
+        const fontStack = `${c.font_family}, 'DM Sans', sans-serif`;
+        document.getElementById('appWrapper').style.fontFamily = fontStack;
+
+        // Font size scaling
+        const base = c.font_size || 16;
+        document.getElementById('heroTitle').style.fontSize = `${base * 3}px`;
+        document.getElementById('heroSubtitle').style.fontSize = `${base * 1.15}px`;
+
+        document.querySelectorAll('h2').forEach(el => el.style.fontSize = `${base * 2}px`);
+        document.querySelectorAll('h3').forEach(el => el.style.fontSize = `${base * 1.25}px`);
+        document.querySelectorAll('h4').forEach(el => el.style.fontSize = `${base * 1.05}px`);
+        document.querySelectorAll('p, span, a, label, button, textarea, input').forEach(el => {
+          if (!el.closest('h1, h2, h3, h4')) {
+            // Preserve relative sizing
+          }
+        });
+      },
+      mapToCapabilities: (config) => {
+        const c = { ...defaultConfig, ...config };
+        return {
+          recolorables: [
+            { get: () => c.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+            { get: () => c.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+            { get: () => c.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+            { get: () => c.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); } },
+            { get: () => c.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); } },
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => c.font_family,
+            set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+          },
+          fontSizeable: {
+            get: () => c.font_size,
+            set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+          }
+        };
+      },
+      mapToEditPanelValues: (config) => {
+        const c = { ...defaultConfig, ...config };
+        return new Map([
+          ['school_name', c.school_name],
+          ['hero_subtitle', c.hero_subtitle],
+          ['history_title', c.history_title],
+          ['philosophy_title', c.philosophy_title],
+          ['techniques_title', c.techniques_title],
+          ['ranks_title', c.ranks_title],
+          ['contact_title', c.contact_title],
+          ['footer_text', c.footer_text],
+        ]);
+      }
+    });
+
+    // Render belts and icons
+    renderBelts();
+    lucide.createIcons();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e06c327b5684831',t:'MTc3NDE5ODkyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
